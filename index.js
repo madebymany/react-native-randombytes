@@ -35,22 +35,24 @@ export function seedSJCL (cb) {
   })
 }
 
-export function randomBytes (length, cb) {
-  if (!cb) {
-    let size = length
-    let wordCount = Math.ceil(size * 0.25)
-    let randomBytes = sjcl.random.randomWords(wordCount, 10)
-    let hexString = sjcl.codec.hex.fromBits(randomBytes)
-    hexString = hexString.substr(0, size * 2)
-    return new Buffer(hexString, 'hex')
-  }
+export function randomBytesSync (length) {
+  let size = length
+  let wordCount = Math.ceil(size * 0.25)
+  let randomBytes = sjcl.random.randomWords(wordCount, 10)
+  let hexString = sjcl.codec.hex.fromBits(randomBytes)
+  hexString = hexString.substr(0, size * 2)
+  return new Buffer(hexString, 'hex')
+}
 
-  RNRandomBytes.randomBytes(length, function(err, base64String) {
-    if (err) {
-      cb(err)
-    } else {
-      cb(null, toBuffer(base64String))
-    }
+export function randomBytes (length) {
+  return new Promise(function (resolve, reject) {
+    RNRandomBytes.randomBytes(length, function(err, base64String) {
+      if (err || !base64String) {
+        reject(err)
+      } else {
+        resolve(toBuffer(base64String))
+      }
+    })
   })
 }
 
